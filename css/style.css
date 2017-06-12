@@ -7,17 +7,27 @@ td {
     min-width: 150px;
     padding-left: 35px;
 }
+.fa-clock-o{
+  color: 	#1E90FF;
+}
+
+.fa-heart{
+  color: #F0F8FF;
+}
+
+.fa-usd{
+  color: #FFD700;
+}
 
 .fa-car {
     font-size: 5em;
-    color: #FFD700;
+    color: 		#000000;
 }
 
 .fa-bug {
     font-size: 6em;
     color: #800000;
 }
-
 .way {
     background-image: url(../img/grass2.jpg);
     background-size: cover;
