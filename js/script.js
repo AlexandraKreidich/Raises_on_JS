@@ -6,6 +6,8 @@ var Raises = {
 
     Queue: [],
 
+    PAUSE: false,
+    TIMER_ID: 0,
     LENGTH_OF_FIELD: null,
     WIDTH_OF_FIELD: null,
     PASSABLE_SPACE: [0, 2, 3, 4], // пустое поле-0, остальное бонусы
@@ -24,11 +26,14 @@ var Raises = {
     showRate: function() {
         if (localStorage.getItem('players') == null)
             localStorage.setItem('players', "[]");
-        var localValue = localStorage.getItem('players');
-        var players = JSON.parse(localValue);
+        var players = JSON.parse(localStorage.getItem('players'));
         players.push(Raises.playerArea.player);
+        players.sort(function(a, b) {
+            return b.coins - a.coins;
+        });
         localStorage.setItem('players', JSON.stringify(players));
         console.log(players);
+        return players;
     },
 
     startApp: {
@@ -40,14 +45,14 @@ var Raises = {
             Raises.playArea.generateField();
             Raises.playerArea.showInfo();
             if (Raises.playerArea.player.lives <= 0) {
-                Raises.showRate();
                 Raises.playerArea.showUserDead();
                 return;
             }
-            setTimeout(Raises.startApp.play, Raises.START_INTERVAL_TIME);
+            Raises.TIMER_ID = setTimeout(Raises.startApp.play, Raises.START_INTERVAL_TIME);
         },
 
         initApp: function() {
+            //localStorage.clear();
             Raises.field = Raises.playArea.createStartArray();
             Raises.tmpField = Raises.playArea.createTmpArray(Raises.field);
             Raises.playArea.drawField(Raises.field);
@@ -103,6 +108,14 @@ var Raises = {
             var info = document.getElementById('userInfo');
             var str = '<h1>Ooops! ' + Raises.playerArea.player.name + ', you died! </h1><p>Your score: ' + Raises.playerArea.player.coins + '</p>';
             info.innerHTML = str;
+            var players = Raises.showRate();
+            var str = '<ul class="list-group">';
+            for (var elem of players) {
+                str += '<li class="list-group-item">' + elem.name + '<span class="badge">' + elem.coins + '</span></li>';
+            };
+            str += '</ul>';
+            var div = document.getElementById('rate');
+            div.innerHTML = str;
         },
 
         playerMove: function(e) {
@@ -119,6 +132,14 @@ var Raises = {
                 Raises.field[player.x][player.y] = 0;
                 Raises.field[player.x][--player.y] = Raises.PLAYER_SPACE;
             }
+
+            /*if (e.keyCode == 27 && !Raises.PAUSE) {
+                Raises.PAUSE = true;
+                clearTimeout(Raises.TIMER_ID);
+            } else {
+                Raises.PAUSE = false;
+                Raises.startApp.play();
+            }*/
             Raises.playArea.drawField(Raises.field);
         },
 
@@ -126,7 +147,7 @@ var Raises = {
             var player = Raises.playerArea.findPlayer(Raises.field);
             switch (lastLine[player.y]) {
                 case Raises.IMPASSABLE_SPACE:
-                    Raises.playerArea.player.lives -= 3;
+                    Raises.playerArea.player.lives = (Raises.playerArea.player.lives -3 > 0) ? Raises.playerArea.player.lives - 3 : 0;
                     break;
                 case Raises.BONUS_LIVE:
                     Raises.playerArea.player.lives += 1;
