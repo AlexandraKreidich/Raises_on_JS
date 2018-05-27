@@ -1,2 +1,2 @@
 # Raises_on_JavaScript
-My firs game on JavaScript
+My first game on JavaScript
